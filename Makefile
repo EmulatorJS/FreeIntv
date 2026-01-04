@@ -1,5 +1,6 @@
 STATIC_LINKING=0
 AR := ar
+EMULATORJS_THREADS ?= 0
 
 ifeq ($(platform),)
 platform = unix
@@ -281,8 +282,13 @@ else ifeq ($(platform), emscripten)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).bc
 	AR = emar
 	fpic := -fPIC
-	SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
+	SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T
 	STATIC_LINKING=1
+	ifeq ($(EMULATORJS_THREADS), 1)
+		LDFLAGS += -pthread
+		CFLAGS += -pthread
+		CXXFLAGS += -pthread
+	endif
 
 # Playstation PS2
 else ifeq ($(platform), ps2)
